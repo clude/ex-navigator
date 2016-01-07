@@ -4,6 +4,9 @@ import type { Component } from 'react-native';
 import type * as ExNavigator from './ExNavigator';
 
 export type ExRoute = {
+  title?: ?string,
+  component?: ?Component,
+  passProps?: ?Object,
   getTitle?: (navigator: ExNavigator, index: number, state: Object) => ?string;
   renderTitle?: (navigator: ExNavigator, index: number, state: Object) => ?Component;
   renderLeftButton?: (navigator: ExNavigator, index: number, state: Object) => ?Component;

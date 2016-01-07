@@ -46,13 +46,15 @@ class NavigationBarRouteMapper {
       return route.renderTitle(this._navigator, index, state);
     }
 
-    if (!route.getTitle) {
+    if (!route.getTitle && !route.title) {
       return null;
     }
 
+    let titleStr = (route.getTitle)?route.getTitle(this._navigator, index, state) : route.title;
+
     return (
       <Text style={[ExNavigatorStyles.barTitleText, this._titleStyle]}>
-        {shortenTitle(route.getTitle(this._navigator, index, state))}
+        {shortenTitle(titleStr)}
       </Text>
     );
   }
@@ -72,11 +74,12 @@ class NavigationBarRouteMapper {
       return null;
     }
 
-    return this._renderBackButton(route, index, state);
+    return this._renderBackButton(route, this._navigator, index, state);
   }
 
   _renderBackButton(
     route: ExRoute,
+    navigator: Navigator,
     index: number,
     state: Object,
   ): ?React.Component {
@@ -91,18 +94,20 @@ class NavigationBarRouteMapper {
       title = route.getBackButtonTitle(this._navigator, index, state);
     } else if (previousRoute.getTitle) {
       title = previousRoute.getTitle(this._navigator, previousIndex, state);
+    } else if (previousRoute.title) {
+      title = previousRoute.title;
     }
 
-    let buttonText;
     if (title) {
-      buttonText =
+      var buttonText =
         <Text
           numberOfLines={1}
           style={[
             ExNavigatorStyles.barButtonText,
             ExNavigatorStyles.barBackButtonText,
             this._barButtonTextStyle,
-          ]}>
+          ]}
+        >
           {title}
         </Text>;
     }
@@ -170,13 +175,16 @@ export default class ExRouteRenderer {
       });
     }
 
-    invariant(
-      route.getSceneClass,
-      'The route must implement renderScene or getSceneClass',
-    );
-    let Component = route.getSceneClass();
+    if(!route.component){
+      invariant(
+          route.getSceneClass,
+          'The route must implement renderScene or getSceneClass',
+      );
+    }
+    let Component = (route.getSceneClass)?route.getSceneClass():route.component;
     return (
       <Component
+        {...route.passProps}
         ref={component => { route.scene = component; }}
         navigator={navigator}
       />
