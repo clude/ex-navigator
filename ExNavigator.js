@@ -160,6 +160,12 @@ export default class ExNavigator extends React.Component {
       this.props.navigator :
       this.__navigator.parentNavigator;
   }
+
+  fireEvent(eventType, data) {
+    if(this.__navigator.navigationContext){
+      this.__navigator.navigationContext.emit(eventType, data);
+    }
+  }
 }
 
 Object.assign(ExNavigator.prototype, ExNavigatorMixin);
